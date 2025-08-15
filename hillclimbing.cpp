@@ -15,6 +15,7 @@ vector<pair<int, int>> hillclimbing(int startx, int starty, int endx, int endy, 
 	vector<vector<bool>> visited(N, vector<bool>(N, false));
 	rec.push_back(make_pair(startx, starty));
 	visited[startx][starty] = true;
+	visited[starty][startx] = true;
 	int x = startx;
 	int y = starty;
 	vector<pair<int, int>> moves = { {-1, 0}, {1, 0}, {0, 1}, {0, -1} };
@@ -42,6 +43,7 @@ vector<pair<int, int>> hillclimbing(int startx, int starty, int endx, int endy, 
 		x = newpos.first;
 		y = newpos.second;
 		visited[x][y] = true;
+		visited[y][x] = true;
 		rec.push_back(make_pair(x, y));
 	}
 
