@@ -1,8 +1,10 @@
 #include <iostream>
 #include <vector>
-#include <unordered_map>
 #include <queue>
 #include <cmath>
+#include <utility>
+#include <unordered_map>
+using namespace std;
 using namespace std;
 
 int N = 200;
@@ -10,52 +12,80 @@ int N = 200;
 int heuristica(int x, int y, int endx, int endy) {
 	int dx = x - endx;
 	int dy = y - endy;
-	return dx * dx + dy * dy; 
+	return dx * dx + dy * dy;
 }
+
+struct node {
+	int x;
+	int y;
+	int h;
+	bool operator<(const node& other) const {
+		return h > other.h;
+	}
+};
 
 vector<pair<int, int>> hillclimbing(int startx, int starty, int endx, int endy, vector<vector<int>>& matriz) {
 	vector<pair<int, int>> rec;
 	vector<vector<bool>> visited(N, vector<bool>(N, false));
-	rec.push_back(make_pair(startx, starty));
-	visited[startx][starty] = true;
-	int x = startx;
-	int y = starty;
-	vector<pair<int, int>> moves = { {-1, 0}, {1, 0}, {0, 1}, {0, -1}, {-1, -1}, {-1, 1}, {1, -1}, {1, 1} };
-	while (x != endx || y != endy) {
-		int heuristicaactual = heuristica(x, y, endx, endy);
-		pair<int, int> newpos = { -1, -1 };
-		for (auto e : moves) {
-			int posiblex = x + e.first;
-			int posibley = y + e.second;
+	vector<pair<int, int>> moves = { {-1,0},{1,0},{0,-1},{0,1},{-1,-1},{-1,1},{1,-1},{1,1} };
+	vector<vector<pair<int, int>>> padre(N, vector<pair<int, int>>(N, { -1,-1 }));
 
-			if (posiblex >= 0 && posiblex < N && posibley >= 0 && posibley < N && !visited[posiblex][posibley] && matriz[posiblex][posibley] != -1) {
-				int newheuristica = heuristica(posiblex, posibley, endx, endy);
-				if (newheuristica < heuristicaactual) {
-					heuristicaactual = newheuristica;
-					newpos = make_pair(posiblex, posibley);
+	priority_queue<node> pq;
+	pq.push({ startx, starty, heuristica(startx, starty, endx, endy) });
+	visited[startx][starty] = true;
+	bool find = false;
+
+	while (!pq.empty()) {
+		node actual = pq.top();
+		pq.pop();
+
+		if (actual.x == endx && actual.y == endy) {
+			find = true;
+			break;
+		}
+
+		int heuristicaactual = actual.h;
+		for (auto e : moves) {
+			int nx = actual.x + e.first;
+			int ny = actual.y + e.second;
+
+			if (nx >= 0 && nx < N && ny >= 0 && ny < N && !visited[nx][ny] && matriz[nx][ny] != -1) {
+				int nh = heuristica(nx, ny, endx, endy);
+				if (nh <= heuristicaactual) {
+					pq.push({ nx, ny, nh });
+					visited[nx][ny] = true;
+					padre[nx][ny] = { actual.x, actual.y };
 				}
 			}
 		}
 
-		if (newpos.first == -1 || newpos.second == -1) {
-			break;
+		if (find) {
+			int cx = endx;
+			int cy = endy;
+			while (!(cx == startx && cy == starty)) {
+				rec.push_back({ cx,cy });
+				auto p = padre[cx][cy];
+				cx = p.first;
+				cy = p.second;
+			}
+			rec.push_back({ startx,starty });
+			reverse(rec.begin(), rec.end());
 		}
-
-		x = newpos.first;
-		y = newpos.second;
-		visited[x][y] = true;
-		rec.push_back(make_pair(x, y));
+		return rec;
 	}
-
-	return rec;
 }
 
 int main() {
+	int N = 200;
 	vector<vector<int>> matriz(N, vector<int>(N, 1));
-	vector<pair<int, int>> rec = hillclimbing(0, 0, 10, 10, matriz);
-	for (auto e : rec) {
-		cout << "(" << e.first << "," << e.second << ")" << endl;
+
+	for (int i = 5; i < 15; i++) {
+		matriz[i][7] = -1;
 	}
 
+	vector<pair<int, int>> rec = hillclimbing(0, 0, 10, 10, matriz);
 
+	for (auto e : rec) {
+		cout << "(" << e.first << "," << e.second << ")\n";
+	}
 }
