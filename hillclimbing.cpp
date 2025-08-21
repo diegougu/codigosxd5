@@ -2,12 +2,15 @@
 #include <vector>
 #include <unordered_map>
 #include <queue>
+#include <cmath>
 using namespace std;
 
 int N = 200;
 
 int heuristica(int x, int y, int endx, int endy) {
-	return abs(x - endx) + abs(y - endy);
+	int dx = x - endx;
+	int dy = y - endy;
+	return dx * dx + dy * dy; 
 }
 
 vector<pair<int, int>> hillclimbing(int startx, int starty, int endx, int endy, vector<vector<int>>& matriz) {
@@ -15,11 +18,9 @@ vector<pair<int, int>> hillclimbing(int startx, int starty, int endx, int endy, 
 	vector<vector<bool>> visited(N, vector<bool>(N, false));
 	rec.push_back(make_pair(startx, starty));
 	visited[startx][starty] = true;
-	visited[starty][startx] = true;
 	int x = startx;
 	int y = starty;
-	vector<pair<int, int>> moves = { {-1, 0}, {1, 0}, {0, 1}, {0, -1} };
-
+	vector<pair<int, int>> moves = { {-1, 0}, {1, 0}, {0, 1}, {0, -1}, {-1, -1}, {-1, 1}, {1, -1}, {1, 1} };
 	while (x != endx || y != endy) {
 		int heuristicaactual = heuristica(x, y, endx, endy);
 		pair<int, int> newpos = { -1, -1 };
@@ -43,7 +44,6 @@ vector<pair<int, int>> hillclimbing(int startx, int starty, int endx, int endy, 
 		x = newpos.first;
 		y = newpos.second;
 		visited[x][y] = true;
-		visited[y][x] = true;
 		rec.push_back(make_pair(x, y));
 	}
 
