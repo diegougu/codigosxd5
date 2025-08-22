@@ -57,21 +57,20 @@ vector<pair<int, int>> hillclimbing(int startx, int starty, int endx, int endy, 
 				}
 			}
 		}
-
-		if (find) {
-			int cx = endx;
-			int cy = endy;
-			while (!(cx == startx && cy == starty)) {
-				rec.push_back({ cx,cy });
-				auto p = padre[cx][cy];
-				cx = p.first;
-				cy = p.second;
-			}
-			rec.push_back({ startx,starty });
-			reverse(rec.begin(), rec.end());
-		}
-		return rec;
 	}
+	if (find) {
+		int cx = endx;
+		int cy = endy;
+		while (!(cx == startx && cy == starty)) {
+			rec.push_back({ cx,cy });
+			auto p = padre[cx][cy];
+			cx = p.first;
+			cy = p.second;
+		}
+		rec.push_back({ startx,starty });
+		reverse(rec.begin(), rec.end());
+	}
+	return rec;
 }
 
 int main() {
